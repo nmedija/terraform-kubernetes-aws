@@ -10,7 +10,9 @@ cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 apt-get update -y
-apt-get install -y kubelet=1.13.3-00 kubeadm=1.13.3-00 kubectl=1.13.3-00
+apt-get install -y kubelet=${kubernetes_version} \
+                   kubeadm=${kubernetes_version} \
+                   kubectl=${kubernetes_version}
 apt-mark hold kubelet kubeadm kubectl
 
 kubeadm_token=$(kubeadm token generate)

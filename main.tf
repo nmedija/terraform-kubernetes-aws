@@ -70,6 +70,9 @@ resource "aws_security_group" "sg_kubeworker" {
 
 data "template_file" "bootstrap_master" {
   template = "${file("${path.module}/templates/bootstrap-master.bash.tpl")}"
+  vars {
+    kubernetes_version="${var.kubernetes_version}"
+  }
 }
 
 resource "aws_instance" "kube_master" {
@@ -127,8 +130,15 @@ resource "null_resource" "copy_token_hash" {
   }
 }
 
+# -------------------
+# Create worker nodes
+# -------------------
+
 data "template_file" "bootstrap_worker" {
   template = "${file("${path.module}/templates/bootstrap-worker.bash.tpl")}"
+  vars {
+    kubernetes_version="${var.kubernetes_version}"
+  }
 }
 
 data "template_file" "kubeadm_join" {
@@ -138,10 +148,6 @@ data "template_file" "kubeadm_join" {
     master_port = "6443"
   }
 }
-
-# -------------------
-# Create worker nodes
-# -------------------
 
 resource "aws_instance" "kube_worker" {
   count = "${var.worker_nodes_count}"
@@ -168,8 +174,8 @@ resource "aws_instance" "kube_worker" {
   }
 
   provisioner "file" {
-    source = "/tmp/.kubeadm_hash"
-    destination = "/tmp/.kubeadm_hash"
+    content = "${data.template_file.kubeadm_join.rendered}"
+    destination = "/tmp/kubeadm_join.bash"
   }
 }
 
@@ -201,13 +207,13 @@ resource "null_resource" "push_token_hash" {
   }
 
   provisioner "file" {
-    content = "${data.template_file.kubeadm_join.rendered}"
-    destination = "/tmp/kubeadm_join.bash"
+    source = "/tmp/.kubeadm_token"
+    destination = "/tmp/.kubeadm_token"
   }
 
   provisioner "file" {
-    source = "/tmp/.kubeadm_token"
-    destination = "/tmp/.kubeadm_token"
+    source = "/tmp/.kubeadm_hash"
+    destination = "/tmp/.kubeadm_hash"
   }
 }
 

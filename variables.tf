@@ -6,6 +6,10 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
+variable "kubernetes_version" {
+  default = "1.13.3-*"
+}
+
 variable "master_node_hostname" {
   default = "kubemaster"
 }
