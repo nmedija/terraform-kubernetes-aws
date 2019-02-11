@@ -1,0 +1,44 @@
+{
+  "variables": {
+    "aws_profile": "terraform-admin",
+    "aws_region": "us-east-1",
+    "kubernetes_version": "1.13.3-00",
+    "ubuntu_ami": ""
+  },
+  "builders": [
+    {
+      "name": "ami-ubuntu",
+      "type": "amazon-ebs",
+      "instance_type": "t2.small",
+      "source_ami": "{{user `ubuntu_ami`}}",
+      "ami_name": "ami-ubuntu-18.04-k8s-{{user `kubernetes_version`}}-{{timestamp}}",
+      "profile": "{{user `aws_profile`}}",
+      "region": "{{user `aws_region`}}",
+      "ssh_username": "ubuntu",
+      "tags": {
+        "source_ami": "{{user `ubuntu_ami`}}",
+        "build_date": "{{isotime}}",
+        "distribution": "Ubuntu",
+        "distribution_release": "bionic",
+        "distribution_version": "18.04",
+        "kubernetes_version": "{{user `kubernetes_version`}}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update -y",
+        "sudo apt-get install -y python-minimal"
+      ]
+    },
+    {
+      "type": "ansible",
+      "playbook_file": "../ansible/playbook.yml",
+      "ansible_env_vars": [
+        "ANSIBLE_HOST_KEY_CHECKING=False",
+        "ANSIBLE_SSH_ARGS='-o ForwardAgent=yes -o ControlMaster=auto -o ControlPersist=60s'" ]
+     }
+  ]
+}

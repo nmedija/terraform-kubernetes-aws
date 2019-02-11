@@ -1,0 +1,4 @@
+{
+  "aws_region": "us-west-1",
+  "ubuntu_ami" : "ami-0bf3d63a666665438"
+}

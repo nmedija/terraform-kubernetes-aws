@@ -1,0 +1,28 @@
+---
+- name: install dependencies
+  apt:
+    name: [
+      "software-properties-common",
+      "apt-transport-https",
+      "ca-certificates"
+    ]
+    state: latest
+
+- name: add docker apt key
+  apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+
+- name: add docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    update_cache: True
+
+- name: install docker
+  apt:
+    name: "docker-ce={{ docker_version }}"
+    state: present
+
+- name: install docker-py
+  pip:
+    name: docker-py

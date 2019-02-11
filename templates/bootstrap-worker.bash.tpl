@@ -1,22 +1,5 @@
 #!/usr/bin/env bash
 
-export DEBIAN_FRONTEND=noninteractive
-
-apt-get upgrade -y && apt-get update && apt-get install -y apt-transport-https
-apt-get install -y docker.io
-
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-apt-get update -y
-apt-get install -y kubelet=${kubernetes_version} \
-                   kubeadm=${kubernetes_version} \
-                   kubectl=${kubernetes_version}
-apt-mark hold kubelet kubeadm kubectl
-
-sysctl net.bridge.bridge-nf-call-iptables=1
-
 check_join_ready() {
   if [  -f "/tmp/kubeadm_join.bash" ] && [ -f "/tmp/.kubeadm_token" ] && [ -f "/tmp/.kubeadm_hash" ]; then
     echo "Y"

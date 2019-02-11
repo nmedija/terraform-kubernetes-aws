@@ -1,0 +1,9 @@
+---
+- hosts: all
+  order: sorted
+  gather_facts: False
+  become: yes
+  roles:
+    - role: common
+    - role: docker
+    - role: kubernetes-common

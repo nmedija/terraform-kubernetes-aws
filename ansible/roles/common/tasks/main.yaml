@@ -1,0 +1,31 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: True
+    cache_valid_time: 3600
+
+- name: install common dependencies
+  apt:
+    name: [
+      "software-properties-common",
+      "apt-transport-https",
+      "ca-certificates",
+      "python-pip",
+      "ntp",
+      "jq"
+    ]
+    state: latest
+
+- name: load br_netfilter
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: ensure iptables proxy work for network plugins
+  become: yes
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
